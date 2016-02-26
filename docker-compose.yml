@@ -1,0 +1,70 @@
+version: '2'
+
+networks:
+  sql-cluster:
+    driver: bridge
+
+services:
+  proxy:
+    build: ./haproxy
+    ports:
+      - 3306:3306
+      - 1936:1936
+    networks:
+      - sql-cluster
+    depends_on:
+      - mysql1
+      - mysql2
+      - mysql3
+
+
+  mysql1:
+    build: ./mariadb
+    networks:
+      - sql-cluster
+    environment:
+      - MODE=BOOT
+      - MYSQL_ROOT_PASSWORD=test
+      - REPLICATION_PASSWORD=test
+      - MYSQL_DATABASE=maria
+      - MYSQL_USER=maria
+      - MYSQL_PASSWORD=test
+      - GALERA=On
+      - NODE_NAME=mysql1
+      - CLUSTER_NAME=maria_cluster
+      - CLUSTER_ADDRESS=gcomm://
+      - HAPROXY_USER=haproxy_check
+    command: --wsrep-new-cluster
+
+  mysql2:
+    build: ./mariadb
+    networks:
+      - sql-cluster
+    environment:
+      - MYSQL_ROOT_PASSWORD=test
+      - REPLICATION_PASSWORD=test
+      - MYSQL_DATABASE=maria
+      - MYSQL_USER=maria
+      - MYSQL_PASSWORD=test
+      - GALERA=On
+      - NODE_NAME=mysql2
+      - CLUSTER_NAME=maria_cluster
+      - CLUSTER_ADDRESS=gcomm://mysql1
+      - HAPROXY_USER=haproxy_check
+      
+  mysql3:
+    build: ./mariadb
+    networks:
+      - sql-cluster
+    environment:
+      - MYSQL_ROOT_PASSWORD=test
+      - REPLICATION_PASSWORD=test
+      - MYSQL_DATABASE=maria
+      - MYSQL_USER=maria
+      - MYSQL_PASSWORD=test
+      - GALERA=On
+      - NODE_NAME=mysql3
+      - CLUSTER_NAME=maria_cluster
+      - CLUSTER_ADDRESS=gcomm://mysql1
+      - HAPROXY_USER=haproxy_check
+      
