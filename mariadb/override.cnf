@@ -19,7 +19,7 @@ wsrep_on=ON
 wsrep_provider=/usr/lib/libgalera_smm.so
 wsrep_provider_options="gcache.size=300M; gcache.page_size=300M"
 wsrep_cluster_name="example_cluster"
-wsrep_cluster_address="gcomm://mysql1,mysql2,mysql3"
+wsrep_cluster_address="gcomm://mysql-node-1,mysql-node-2,mysql-node-3"
 wsrep_sst_method=rsync
 
 [mysql_safe]

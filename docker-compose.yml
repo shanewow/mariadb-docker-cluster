@@ -5,7 +5,8 @@ networks:
     driver: bridge
 
 services:
-  proxy:
+  mysql-proxy-1:
+    container_name: mysql-proxy-1
     build: ./haproxy
     ports:
       - 3306:3306
@@ -13,58 +14,51 @@ services:
     networks:
       - sql-cluster
     depends_on:
-      - mysql1
-      - mysql2
-      - mysql3
+      - mysql-node-1
+      - mysql-node-2
+      - mysql-node-3
 
 
-  mysql1:
+  mysql-node-1:
+    container_name: mysql-node-1
     build: ./mariadb
     networks:
       - sql-cluster
     environment:
       - MODE=BOOT
       - MYSQL_ROOT_PASSWORD=test
-      - REPLICATION_PASSWORD=test
       - MYSQL_DATABASE=maria
       - MYSQL_USER=maria
       - MYSQL_PASSWORD=test
+      - HAPROXY_USER=haproxy_check
       - GALERA=On
-      - NODE_NAME=mysql1
+      - REPLICATION_PASSWORD=test
+      - NODE_NAME=mysql-node-1
       - CLUSTER_NAME=maria_cluster
       - CLUSTER_ADDRESS=gcomm://
-      - HAPROXY_USER=haproxy_check
     command: --wsrep-new-cluster
 
-  mysql2:
+  mysql-node-2:
+    container_name: mysql-node-2
     build: ./mariadb
     networks:
       - sql-cluster
     environment:
-      - MYSQL_ROOT_PASSWORD=test
-      - REPLICATION_PASSWORD=test
-      - MYSQL_DATABASE=maria
-      - MYSQL_USER=maria
-      - MYSQL_PASSWORD=test
       - GALERA=On
-      - NODE_NAME=mysql2
+      - REPLICATION_PASSWORD=test
+      - NODE_NAME=mysql-node-2
       - CLUSTER_NAME=maria_cluster
-      - CLUSTER_ADDRESS=gcomm://mysql1
-      - HAPROXY_USER=haproxy_check
+      - CLUSTER_ADDRESS=gcomm://mysql-node-1
       
-  mysql3:
+  mysql-node-3:
+    container_name: mysql-node-3
     build: ./mariadb
     networks:
       - sql-cluster
     environment:
-      - MYSQL_ROOT_PASSWORD=test
-      - REPLICATION_PASSWORD=test
-      - MYSQL_DATABASE=maria
-      - MYSQL_USER=maria
-      - MYSQL_PASSWORD=test
       - GALERA=On
-      - NODE_NAME=mysql3
+      - REPLICATION_PASSWORD=test
+      - NODE_NAME=mysql-node-3
       - CLUSTER_NAME=maria_cluster
-      - CLUSTER_ADDRESS=gcomm://mysql1
-      - HAPROXY_USER=haproxy_check
+      - CLUSTER_ADDRESS=gcomm://mysql-node-1
       
