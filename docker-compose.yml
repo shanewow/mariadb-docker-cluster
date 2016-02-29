@@ -3,6 +3,8 @@ version: '2'
 networks:
   sql-cluster:
     driver: bridge
+  sql:
+    driver: bridge
 
 services:
   mysql-proxy-1:
@@ -12,6 +14,7 @@ services:
       - 3306:3306
       - 1936:1936
     networks:
+      - sql
       - sql-cluster
     depends_on:
       - mysql-node-1
